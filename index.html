@@ -5,22 +5,28 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Time Assistant</title>
 
-  <link rel="apple-touch-icon" sizes="180x180" href="https://favicons.it/v1/png/hourglass_flowing_sand?size=180&bg=2c3e50">
-  <link rel="icon" type="image/png" sizes="32x32" href="https://favicons.it/v1/png/hourglass_flowing_sand?size=32&bg=2c3e50">
+  <!-- ICONO EMBEBIDO EN BASE64 (MÁXIMA COMPATIBILIDAD SIN ENLACES EXTERNOS) -->
+  <link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAMAAABwKC9nAAAAVFBMVEUAAABCwshCwshCwshCwshCwshCwshCwshCwshCwshCwshCwshCwshCwshCwshCwshCwshCwshCwshCwshCwshCwshCwshCwshCwshCwshCwshCwsjLg27FAAAAGnRSTlMAGBAwQEBAgICAQEBAQECAgIDAwMDAwMDQ0ND978XfAAAAhklEQVRo3u3ayw6EIAwF0FEqiI9e9///bhWhM8ZAnenmLOw86YpJi8vM6pEwNscVpInhAnmYgVwYIJCDGciFAQI5mIFcGCEgZgByYf7MDCAXf6w9YpZ00L09McsZ86O7YmKekA66U98wM0w66B7M6fco75wYJh3k9g46O3q6v8O0L09YfGid0Gsc1Xo6Z6wYRwAAAABJRU5ErkJggg==">
+  <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAMAAABwKC9nAAAAVFBMVEUAAABCwshCwshCwshCwshCwshCwshCwshCwshCwshCwshCwshCwshCwshCwshCwshCwshCwshCwshCwshCwshCwshCwshCwshCwshCwshCwshCwsjLg27FAAAAGnRSTlMAGBAwQEBAgICAQEBAQECAgIDAwMDAwMDQ0ND978XfAAAAhklEQVRo3u3ayw6EIAwF0FEqiI9e9///bhWhM8ZAnenmLOw86YpJi8vM6pEwNscVpInhAnmYgVwYIJCDGciFAQI5mIFcGCEgZgByYf7MDCAXf6w9YpZ00L09McsZ86O7YmKekA66U98wM0w66B7M6fco75wYJh3k9g46O3q6v8O0L09YfGid0Gsc1Xo6Z6wYRwAAAABJRU5ErkJggg==">
 </head>
 <body>
 
+<!-- ========================================== -->
+<!-- 1. ARCHITECTURE OF THE APPLICATION (HTML)  -->
+<!-- ========================================== -->
 <div class="app-container">
   <header>
     <h1>Time 🕒</h1>
     <p>Global Time & Meeting Assistant</p>
   </header>
 
+  <!-- NAVEGACIÓN ENTRE PESTAÑAS -->
   <nav class="tab-navigation">
     <button class="tab-btn active" onclick="switchTab('time-by-cities')">Cities</button>
     <button class="tab-btn" onclick="switchTab('meeting-planner')">Planner</button>
   </nav>
 
+  <!-- PESTAÑA 1: COMPARADOR DE CIUDADES -->
   <div id="time-by-cities" class="tab-content active">
     <section class="inputs-section">
       <h3>1. Origin Setup</h3>
@@ -32,7 +38,8 @@
         <div class="input-group">
           <label for="select-origen">Origin City:</label>
           <select id="select-origen" class="selector-ciudad-global">
-            </select>
+            <!-- Se rellena dinámicamente -->
+          </select>
         </div>
       </div>
     </section>
@@ -42,7 +49,8 @@
       
       <div class="section-divider">Fixed Cities</div>
       <div class="list-ciudades" id="ciudades-fijas">
-        </div>
+        <!-- Tarjetas fijas dinámicas -->
+      </div>
       
       <div class="section-divider">Custom Cities (Select)</div>
       <div class="custom-inputs-vertical">
@@ -53,10 +61,12 @@
       </div>
       
       <div class="list-ciudades" id="ciudades-libres">
-        </div>
+        <!-- Resultados de ciudades libres -->
+      </div>
     </section>
   </div>
 
+  <!-- PESTAÑA 2: PLANIFICADOR DE REUNIONES -->
   <div id="meeting-planner" class="tab-content">
     <section class="inputs-section">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
@@ -64,6 +74,7 @@
         <button id="btn-reset-planner" class="reset-btn" onclick="resetPlanner()">Clear All</button>
       </div>
       
+      <!-- LÍNEA 1: JORNADA LABORAL (COMPACTA) -->
       <div class="planner-row-compact" style="background: #e2e8f0; padding: 6px; border-radius: 6px; margin-bottom: 8px;">
         <div class="input-group-half">
           <label class="label-compact">Work Starts:</label>
@@ -75,6 +86,7 @@
         </div>
       </div>
 
+      <!-- LÍNEA 2: FECHA Y DURACIÓN (COMPACTA) -->
       <div class="planner-row-compact" style="margin-bottom: 10px;">
         <div class="input-group-half">
           <label class="label-compact">Date:</label>
@@ -112,6 +124,9 @@
   </div>
 </div>
 
+<!-- ========================================== -->
+<!-- 2. DESIGN & STYLES (CSS)                   -->
+<!-- ========================================== -->
 <style>
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -272,6 +287,9 @@ select, input {
 .placeholder-text { color: #a0aec0; text-align: center; margin: 0; font-size: 0.8rem; }
 </style>
 
+<!-- ========================================== -->
+<!-- 3. LOGIC & PROGRAMMING (JAVASCRIPT)        -->
+<!-- ========================================== -->
 <script>
 const masterCities = [
   { displayName: "🇨🇴 Bogota", zone: "America/Bogota", cleanName: "Bogota", priority: true },
