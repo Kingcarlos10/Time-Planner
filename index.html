@@ -4,13 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Time Assistant</title>
-
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Time App">
-
-  <link rel="apple-touch-icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%232c3e50'/><text y='70' x='18' font-size='60'>⏳</text></svg>">
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%232c3e50'/><text y='70' x='18' font-size='60'>⏳</text></svg>">
 </head>
 <body>
 
@@ -357,7 +350,7 @@ const masterCities = [
   { displayName: "🇳🇵 Kathmandu", zone: "Asia/Kathmandu", cleanName: "Kathmandu", priority: false },
   { displayName: "🇺🇦 Kyiv", zone: "Europe/Kyiv", cleanName: "Kyiv", priority: false },
   { displayName: "🇲🇿 Khartoum", zone: "Africa/Khartoum", cleanName: "Khartoum", priority: false },
-  { displayName: "🇨劃 Kinshasa", zone: "Africa/Kinshasa", cleanName: "Kinshasa", priority: false },
+  { displayName: "🇨🇩 Kinshasa", zone: "Africa/Kinshasa", cleanName: "Kinshasa", priority: false },
   { displayName: "🇲🇾 Kuala Lumpur", zone: "Asia/Kuala_Lumpur", cleanName: "Kuala Lumpur", priority: false },
   { displayName: "🇵🇪 Lima", zone: "America/Lima", cleanName: "Lima", priority: false },
   { displayName: "🇬🇧 London", zone: "Europe/London", cleanName: "London", priority: false },
@@ -389,3 +382,254 @@ const fixedCitiesList = [
   { name: "New York", zone: "America/New_York" },
   { name: "Chicago", zone: "America/Chicago" },
   { name: "Minneapolis", zone: "America/Chicago" },
+  { name: "Phoenix", zone: "America/Phoenix" },
+  { name: "Mexico City", zone: "America/Mexico_City" },
+  { name: "Bogota", zone: "America/Bogota" }
+];
+
+const priorityGroup = masterCities.filter(c => c.priority).sort((a,b) => a.cleanName.localeCompare(b.cleanName));
+const regularGroup = masterCities.filter(c => !c.priority).sort((a,b) => a.cleanName.localeCompare(b.cleanName));
+
+function populateDropdowns() {
+  const selects = document.querySelectorAll('.selector-ciudad-global');
+  selects.forEach(select => {
+    let optionsHtml = `<option value="">-- Select City --</option>`;
+    priorityGroup.forEach(city => {
+      optionsHtml += `<option value="${city.zone}">${city.displayName}</option>`;
+    });
+    optionsHtml += `<option disabled>──────────────────</option>`;
+    regularGroup.forEach(city => {
+      optionsHtml += `<option value="${city.zone}">${city.displayName}</option>`;
+    });
+    select.innerHTML = optionsHtml;
+  });
+  
+  const originSelect = document.getElementById('select-origen');
+  if (originSelect) originSelect.value = "Europe/Madrid";
+}
+
+function switchTab(tabId) {
+  document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+  
+  document.getElementById(tabId).classList.add('active');
+  const activeBtn = Array.from(document.querySelectorAll('.tab-btn')).find(btn => 
+    btn.getAttribute('onclick').includes(tabId)
+  );
+  if (activeBtn) activeBtn.classList.add('active');
+}
+
+function resetPlanner() {
+  for (let i = 1; i <= 5; i++) {
+    const selectEl = document.getElementById(`plan-city-${i}`);
+    if (selectEl) selectEl.value = "";
+  }
+  const resultsContainer = document.getElementById('meeting-results');
+  if (resultsContainer) {
+    resultsContainer.innerHTML = '<p class="placeholder-text">Select at least 2 cities to compute shared slots.</p>';
+  }
+}
+
+function getTargetDateTime(baseDateStr, originZone, targetZone) {
+  const parts = baseDateStr.match(/(\d+)-(\d+)-(\d+)T(\d+):(\d+)/);
+  if (!parts) return { time: '--:--', date: '---' };
+  
+  const year = parseInt(parts[1]), month = parseInt(parts[2]) - 1, day = parseInt(parts[3]);
+  const hour = parseInt(parts[4]), minute = parseInt(parts[5]);
+  
+  const formatterOptions = {
+    year: 'numeric', month: 'numeric', day: 'numeric',
+    hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: false
+  };
+  
+  const originFormatter = new Intl.DateTimeFormat('en-US', { ...formatterOptions, timeZone: originZone });
+  const targetFormatter = new Intl.DateTimeFormat('en-US', { ...formatterOptions, timeZone: targetZone });
+  
+  const utcSnapshot = new Date(Date.UTC(year, month, day, hour, minute));
+  
+  function getOffsetMinutes(formatter, refDate) {
+    const parts = formatter.formatToParts(refDate);
+    const dateParts = {};
+    parts.forEach(p => { dateParts[p.type] = parseInt(p.value); });
+    const localD = Date.UTC(dateParts.year, dateParts.month - 1, dateParts.day, dateParts.hour === 24 ? 0 : dateParts.hour, dateParts.minute);
+    return Math.round((localD - refDate.getTime()) / 60000);
+  }
+  
+  const originOffset = getOffsetMinutes(originZone === 'UTC' ? { formatToParts: () => [] } : originFormatter, utcSnapshot);
+  const targetOffset = getOffsetMinutes(targetZone === 'UTC' ? { formatToParts: () => [] } : targetFormatter, utcSnapshot);
+  
+  const actualTargetTimestamp = utcSnapshot.getTime() - (originOffset * 60000) + (targetOffset * 60000);
+  const targetDateObject = new Date(actualTargetTimestamp);
+  
+  const finalTimeStr = targetDateObject.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'UTC' });
+  const finalDateStr = targetDateObject.toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' });
+  
+  return { time: finalTimeStr, date: finalDateStr };
+}
+
+function updateCitiesTab() {
+  const datetimeValue = document.getElementById('input-datetime-1').value;
+  const originZone = document.getElementById('select-origen').value;
+  
+  if (!datetimeValue || originZone === "") return;
+  
+  const fixedContainer = document.getElementById('ciudades-fijas');
+  if (fixedContainer) {
+    fixedContainer.innerHTML = '';
+    fixedCitiesList.forEach(city => {
+      const data = getTargetDateTime(datetimeValue, originZone, city.zone);
+      fixedContainer.appendChild(createCityCard(city.name, data.time, data.date));
+    });
+  }
+
+  const customContainer = document.getElementById('ciudades-libres');
+  if (customContainer) {
+    customContainer.innerHTML = '';
+    for (let i = 1; i <= 4; i++) {
+      const selectEl = document.getElementById(`libre-${i}`);
+      if (selectEl) {
+        const targetZone = selectEl.value;
+        if (targetZone !== "") {
+          const cityName = selectEl.options[selectEl.selectedIndex].text;
+          const data = getTargetDateTime(datetimeValue, originZone, targetZone);
+          customContainer.appendChild(createCityCard(cityName, data.time, data.date));
+        }
+      }
+    }
+  }
+}
+
+function createCityCard(cityName, formattedTime, formattedDate) {
+  const card = document.createElement('div');
+  card.className = 'tarjeta-ciudad';
+  card.innerHTML = `
+    <div class="info-ciudad-bloque">
+      <h4>${cityName}</h4>
+      <div class="fecha-destino">${formattedDate}</div>
+    </div>
+    <div class="hora">${formattedTime}</div>
+  `;
+  return card;
+}
+
+function updatePlannerTab() {
+  const dateValue = document.getElementById('input-date-2').value;
+  const duration = parseInt(document.getElementById('select-duration').value);
+  const resultsContainer = document.getElementById('meeting-results');
+  if (!resultsContainer) return;
+  
+  const startHourInput = document.getElementById('work-start').value.split(':');
+  const endHourInput = document.getElementById('work-end').value.split(':');
+  
+  const workStartLimit = parseInt(startHourInput[0]) + (parseInt(startHourInput[1]) / 60);
+  const workEndLimit = parseInt(endHourInput[0]) + (parseInt(endHourInput[1]) / 60);
+  
+  const zones = [];
+  const cityNames = [];
+  
+  for (let i = 1; i <= 5; i++) {
+    const selectEl = document.getElementById(`plan-city-${i}`);
+    if (selectEl) {
+      const zone = selectEl.value;
+      if (zone && zone !== "") {
+        zones.push(zone);
+        cityNames.push(selectEl.options[selectEl.selectedIndex].text);
+      }
+    }
+  }
+  
+  if (zones.length < 2) {
+    resultsContainer.innerHTML = '<p class="placeholder-text">Select at least 2 cities to compute shared slots.</p>';
+    return;
+  }
+
+  const hostZone = zones[0]; 
+  let availableSlots = [];
+  
+  for (let hour = 0; hour < 24; hour++) {
+    let allMatch = true;
+    let slotDetails = {};
+    const hostSimulatedIso = `${dateValue}T${String(hour).padStart(2, '0')}:00`;
+    
+    for (let i = 0; i < zones.length; i++) {
+      const checkLocal = getTargetDateTime(hostSimulatedIso, hostZone, zones[i]);
+      const localHour = parseInt(checkLocal.time.split(':')[0]);
+      const localMinute = parseInt(checkLocal.time.split(':')[1]);
+      
+      const startHourDecimal = localHour + (localMinute / 60);
+      const endHourDecimal = startHourDecimal + (duration / 60);
+      
+      if (startHourDecimal < workStartLimit || endHourDecimal > workEndLimit || isNaN(localHour)) {
+        allMatch = false;
+        break;
+      }
+      slotDetails[cityNames[i]] = checkLocal.time;
+    }
+
+    if (allMatch) {
+      availableSlots.push(slotDetails);
+    }
+  }
+
+  if (availableSlots.length === 0) {
+    resultsContainer.innerHTML = '<p class="placeholder-text" style="color: #dd6b20; font-weight: 500;">❌ No matching slots found within your custom work window. Try widening the hours or click "Clear All" above.</p>';
+  } else {
+    resultsContainer.innerHTML = '<h4 style="margin: 0 0 8px 0; color: #2f855a; font-size:0.9rem;">✅ Feasible Working-Hour Slots:</h4>';
+    availableSlots.forEach(slot => {
+      const slotRow = document.createElement('div');
+      slotRow.style.background = '#f0fff4';
+      slotRow.style.border = '1px solid #c6f6d5';
+      slotRow.style.padding = '6px 10px';
+      slotRow.style.borderRadius = '6px';
+      slotRow.style.marginBottom = '6px';
+      slotRow.style.fontSize = '0.78rem';
+      
+      let text = "";
+      for (const [city, time] of Object.entries(slot)) {
+        text += `<strong>${city}</strong> ${time} | `;
+      }
+      slotRow.innerHTML = text.slice(0, -3);
+      resultsContainer.appendChild(slotRow);
+    });
+  }
+}
+
+function initApp() {
+  populateDropdowns();
+
+  const dt1 = document.getElementById('input-datetime-1');
+  const so = document.getElementById('select-origen');
+  if(dt1) dt1.addEventListener('input', updateCitiesTab);
+  if(so) so.addEventListener('change', updateCitiesTab);
+  
+  for (let i = 1; i <= 4; i++) {
+    const el = document.getElementById(`libre-${i}`);
+    if(el) el.addEventListener('change', updateCitiesTab);
+  }
+
+  const d2 = document.getElementById('input-date-2');
+  const sd = document.getElementById('select-duration');
+  const ws = document.getElementById('work-start');
+  const we = document.getElementById('work-end');
+  
+  if(d2) d2.addEventListener('input', updatePlannerTab);
+  if(sd) sd.addEventListener('change', updatePlannerTab);
+  if(ws) ws.addEventListener('input', updatePlannerTab);
+  if(we) we.addEventListener('input', updatePlannerTab);
+  
+  for (let i = 1; i <= 5; i++) {
+    const el = document.getElementById(`plan-city-${i}`);
+    if(el) el.addEventListener('change', updatePlannerTab);
+  }
+
+  updateCitiesTab();
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initApp);
+} else {
+  initApp();
+}
+</script>
+</body>
+</html>
