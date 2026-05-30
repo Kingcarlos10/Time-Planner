@@ -1,14 +1,32 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Time Assistant</title>
+
+  <!-- ICONOS PERSONALIZADOS PARA LA PANTALLA DE INICIO DEL IPHONE (RELOJ DE ARENA) -->
+  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 180 180%22><defs><linearGradient id=%22g%22 x1=%220%22 y1=%220%22 x2=%221%22 y2=%221%22><stop offset=%220%25%22 stop-color=%22%232c3e50%22/><stop offset=%22100%25%22 stop-color=%22%233498db%22/></linearGradient></defs><rect width=%22100%25%22 height=%22100%25%22 fill=%22url(%23g)%22/><text x=%2250%25%22 y=%2256%25%22 font-size=%2295%22 text-anchor=%22middle%22 dominant-baseline=%22middle%22>⏳</text></svg>">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 180 180%22><defs><linearGradient id=%22g%22 x1=%220%22 y1=%220%22 x2=%221%22 y2=%221%22><stop offset=%220%25%22 stop-color=%22%232c3e50%22/><stop offset=%22100%25%22 stop-color=%22%233498db%22/></linearGradient></defs><rect width=%22100%25%22 height=%22100%25%22 fill=%22url(%23g)%22/><text x=%2250%25%22 y=%2256%25%22 font-size=%2295%22 text-anchor=%22middle%22 dominant-baseline=%22middle%22>⏳</text></svg>">
+</head>
+<body>
+
+<!-- ========================================== -->
+<!-- 1. ARCHITECTURE OF THE APPLICATION (HTML)  -->
+<!-- ========================================== -->
 <div class="app-container">
   <header>
     <h1>Time 🕒</h1>
     <p>Global Time & Meeting Assistant</p>
   </header>
 
+  <!-- NAVEGACIÓN ENTRE PESTAÑAS -->
   <nav class="tab-navigation">
     <button class="tab-btn active" onclick="switchTab('time-by-cities')">Cities</button>
     <button class="tab-btn" onclick="switchTab('meeting-planner')">Planner</button>
   </nav>
 
+  <!-- PESTAÑA 1: COMPARADOR DE CIUDADES -->
   <div id="time-by-cities" class="tab-content active">
     <section class="inputs-section">
       <h3>1. Origin Setup</h3>
@@ -20,7 +38,8 @@
         <div class="input-group">
           <label for="select-origen">Origin City:</label>
           <select id="select-origen" class="selector-ciudad-global">
-            </select>
+            <!-- Se rellena dinámicamente -->
+          </select>
         </div>
       </div>
     </section>
@@ -30,7 +49,8 @@
       
       <div class="section-divider">Fixed Cities</div>
       <div class="list-ciudades" id="ciudades-fijas">
-        </div>
+        <!-- Tarjetas fijas dinámicas -->
+      </div>
       
       <div class="section-divider">Custom Cities (Select)</div>
       <div class="custom-inputs-vertical">
@@ -41,10 +61,12 @@
       </div>
       
       <div class="list-ciudades" id="ciudades-libres">
-        </div>
+        <!-- Resultados de ciudades libres -->
+      </div>
     </section>
   </div>
 
+  <!-- PESTAÑA 2: PLANIFICADOR DE REUNIONES -->
   <div id="meeting-planner" class="tab-content">
     <section class="inputs-section">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
@@ -52,6 +74,7 @@
         <button id="btn-reset-planner" class="reset-btn" onclick="resetPlanner()">Clear All</button>
       </div>
       
+      <!-- LÍNEA 1: JORNADA LABORAL (COMPACTA) -->
       <div class="planner-row-compact" style="background: #e2e8f0; padding: 6px; border-radius: 6px; margin-bottom: 8px;">
         <div class="input-group-half">
           <label class="label-compact">Work Starts:</label>
@@ -63,6 +86,7 @@
         </div>
       </div>
 
+      <!-- LÍNEA 2: FECHA Y DURACIÓN (COMPACTA) -->
       <div class="planner-row-compact" style="margin-bottom: 10px;">
         <div class="input-group-half">
           <label class="label-compact">Date:</label>
@@ -100,13 +124,16 @@
   </div>
 </div>
 
+<!-- ========================================== -->
+<!-- 2. DESIGN & STYLES (CSS)                   -->
+<!-- ========================================== -->
 <style>
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   background-color: #f4f7f6;
   color: #333;
   margin: 0;
-  padding: 10px;
+  padding: 8px;
   display: flex;
   justify-content: center;
 }
@@ -114,25 +141,25 @@ body {
 .app-container {
   background: white;
   width: 100%;
-  max-width: 450px;
-  padding: 15px;
+  max-width: 480px; 
+  padding: 12px;
   border-radius: 12px;
   box-shadow: 0 2px 10px rgba(0,0,0,0.05);
   box-sizing: border-box;
 }
 
-header h1 { font-size: 1.6rem; margin: 0; text-align: center; color: #2c3e50; }
-header p { font-size: 0.85rem; margin: 2px 0 12px 0; text-align: center; color: #7f8c8d; }
+header h1 { font-size: 1.5rem; margin: 0; text-align: center; color: #2c3e50; }
+header p { font-size: 0.8rem; margin: 2px 0 10px 0; text-align: center; color: #7f8c8d; }
 
 .tab-navigation {
   display: flex;
   border-bottom: 2px solid #e2e8f0;
-  margin-bottom: 15px;
+  margin-bottom: 12px;
 }
 
 .tab-btn {
   flex: 1;
-  padding: 10px;
+  padding: 8px;
   border: none;
   background: none;
   font-size: 0.95rem;
@@ -154,14 +181,14 @@ header p { font-size: 0.85rem; margin: 2px 0 12px 0; text-align: center; color: 
 
 .inputs-section {
   background: #f8fafc;
-  padding: 12px;
+  padding: 10px;
   border-radius: 8px;
-  margin-bottom: 15px;
+  margin-bottom: 12px;
   border: 1px solid #e2e8f0;
 }
 
-h3 { font-size: 1rem; margin-top: 0; margin-bottom: 10px; color: #2d3748; }
-.input-group { margin-bottom: 10px; }
+h3 { font-size: 0.95rem; margin-top: 0; margin-bottom: 8px; color: #2d3748; }
+.input-group { margin-bottom: 8px; }
 
 .input-vertical-full {
   display: flex;
@@ -172,10 +199,9 @@ h3 { font-size: 1rem; margin-top: 0; margin-bottom: 10px; color: #2d3748; }
   width: 100%;
 }
 
-/* CONTENEDOR ESTRICTO DE 2 COLUMNAS AL 50% */
 .planner-row-compact {
   display: flex;
-  gap: 8px;
+  gap: 6px;
   width: 100%;
   box-sizing: border-box;
 }
@@ -186,9 +212,8 @@ h3 { font-size: 1rem; margin-top: 0; margin-bottom: 10px; color: #2d3748; }
   box-sizing: border-box;
 }
 
-/* REDUCCIÓN DE TAMAÑOS EN EL PLANNER PARA EVITAR SOLAPAMIENTOS */
 .label-compact {
-  font-size: 0.78rem !important;
+  font-size: 0.75rem !important;
   font-weight: 600;
   margin-bottom: 2px !important;
   color: #4a5568;
@@ -196,7 +221,7 @@ h3 { font-size: 1rem; margin-top: 0; margin-bottom: 10px; color: #2d3748; }
 }
 
 .input-compact {
-  padding: 5px 6px !important;
+  padding: 4px 6px !important;
   font-size: 0.85rem !important;
   height: 32px;
   border-radius: 5px;
@@ -206,63 +231,65 @@ h3 { font-size: 1rem; margin-top: 0; margin-bottom: 10px; color: #2d3748; }
   box-sizing: border-box;
 }
 
-label { font-size: 0.85rem; font-weight: 600; margin-bottom: 3px; display: block; color: #4a5568; }
+label { font-size: 0.8rem; font-weight: 600; margin-bottom: 2px; display: block; color: #4a5568; }
 select, input {
-  padding: 8px 10px; border: 1px solid #cbd5e1;
-  border-radius: 6px; font-size: 0.95rem; background: white; box-sizing: border-box;
+  padding: 6px 8px; border: 1px solid #cbd5e1;
+  border-radius: 6px; font-size: 0.9rem; background: white; box-sizing: border-box;
   width: 100%;
 }
 
 .custom-inputs-vertical {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 8px;
-  margin-bottom: 10px;
+  gap: 6px;
+  margin-bottom: 8px;
 }
 .input-libre, .input-planner-city {
-  font-size: 0.85rem;
-  padding: 6px 8px;
+  font-size: 0.8rem;
+  padding: 5px 6px;
   background-color: #fff;
 }
 
 .reset-btn {
   background-color: #edf2f7; color: #4a5568; border: 1px solid #cbd5e1;
-  padding: 4px 10px; font-size: 0.75rem; font-weight: bold; border-radius: 4px;
+  padding: 3px 8px; font-size: 0.7()rem; font-weight: bold; border-radius: 4px;
   cursor: pointer; -webkit-tap-highlight-color: transparent;
 }
-.reset-btn:active { background-color: #cbd5e1; }
 
 .section-divider {
-  font-size: 0.75rem; font-weight: 700; color: #a0aec0;
-  text-transform: uppercase; margin: 15px 0 8px 0;
+  font-size: 0.7rem; font-weight: 700; color: #a0aec0;
+  text-transform: uppercase; margin: 12px 0 6px 0;
   border-bottom: 1px dashed #e2e8f0; padding-bottom: 2px;
 }
 
-.list-ciudades { display: flex; flex-direction: column; gap: 6px; }
+.list-ciudades { display: flex; flex-direction: column; gap: 5px; }
 
 .tarjeta-ciudad {
-  background: #edf2f7; padding: 10px 14px; border-radius: 6px;
+  background: #edf2f7; padding: 8px 12px; border-radius: 6px;
   border-left: 4px solid #3182ce; display: flex;
   justify-content: space-between; align-items: center; box-sizing: border-box;
 }
 
 .info-ciudad-bloque {
-  display: flex; flex-direction: column; gap: 2px;
-  margin-right: 15px; overflow: hidden;
+  display: flex; flex-direction: column; gap: 1px;
+  margin-right: 10px; overflow: hidden;
 }
 
 .tarjeta-ciudad h4 { 
-  margin: 0; font-size: 0.9rem; color: #2d3748;
+  margin: 0; font-size: 0.85rem; color: #2d3748;
   line-height: 1.2; word-break: break-word;
 }
 
-.tarjeta-ciudad .fecha-destino { font-size: 0.72rem; color: #718096; }
-.tarjeta-ciudad .hora { font-size: 1.15rem; font-weight: bold; color: #2b6cb0; white-space: nowrap; }
+.tarjeta-ciudad .fecha-destino { font-size: 0.7rem; color: #718096; }
+.tarjeta-ciudad .hora { font-size: 1.1rem; font-weight: bold; color: #2b6cb0; white-space: nowrap; }
 
-.results-container { background: #f7fafc; border: 1px solid #e2e8f0; padding: 12px; border-radius: 8px; font-size: 0.85rem; }
-.placeholder-text { color: #a0aec0; text-align: center; margin: 0; font-size: 0.85rem; }
+.results-container { background: #f7fafc; border: 1px solid #e2e8f0; padding: 10px; border-radius: 8px; font-size: 0.8rem; }
+.placeholder-text { color: #a0aec0; text-align: center; margin: 0; font-size: 0.8rem; }
 </style>
 
+<!-- ========================================== -->
+<!-- 3. LOGIC & PROGRAMMING (JAVASCRIPT)        -->
+<!-- ========================================== -->
 <script>
 const masterCities = [
   { displayName: "🇨🇴 Bogota", zone: "America/Bogota", cleanName: "Bogota", priority: true },
@@ -360,7 +387,7 @@ const masterCities = [
   { displayName: "🇲🇦 Rabat", zone: "Africa/Casablanca", cleanName: "Rabat", priority: false },
   { displayName: "🇸🇦 Riyadh", zone: "Asia/Riyadh", cleanName: "Riyadh", priority: false },
   { displayName: "🇮🇹 Rome", zone: "Europe/Rome", cleanName: "Rome", priority: false },
-  { displayName: "🇾🇪 Sana'a", zone: "Asia/Aden", cleanName: "Sana'a", priority: false },
+  { displayName: "🇺🇾 Sana'a", zone: "Asia/Aden", cleanName: "Sana'a", priority: false },
   { displayName: "🇨🇱 Santiago", zone: "America/Santiago", cleanName: "Santiago", priority: false },
   { displayName: "🇰🇷 Seoul", zone: "Asia/Tokyo", cleanName: "Seoul", priority: false },
   { displayName: "🇱🇰 Sri Jayawardenepura Kotte", zone: "Asia/Kolkata", cleanName: "Sri Jayawardenepura Kotte", priority: false },
@@ -388,17 +415,13 @@ function populateDropdowns() {
   const selects = document.querySelectorAll('.selector-ciudad-global');
   selects.forEach(select => {
     let optionsHtml = `<option value="">-- Select City --</option>`;
-    
     priorityGroup.forEach(city => {
       optionsHtml += `<option value="${city.zone}">${city.displayName}</option>`;
     });
-    
     optionsHtml += `<option disabled>──────────────────</option>`;
-    
     regularGroup.forEach(city => {
       optionsHtml += `<option value="${city.zone}">${city.displayName}</option>`;
     });
-    
     select.innerHTML = optionsHtml;
   });
   
@@ -449,7 +472,6 @@ function getTargetDateTime(baseDateStr, originZone, targetZone) {
     const parts = formatter.formatToParts(refDate);
     const dateParts = {};
     parts.forEach(p => { dateParts[p.type] = parseInt(p.value); });
-    
     const localD = Date.UTC(dateParts.year, dateParts.month - 1, dateParts.day, dateParts.hour === 24 ? 0 : dateParts.hour, dateParts.minute);
     return Math.round((localD - refDate.getTime()) / 60000);
   }
@@ -621,3 +643,5 @@ if (document.readyState === "loading") {
   initApp();
 }
 </script>
+</body>
+</html>
