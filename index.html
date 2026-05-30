@@ -1,0 +1,623 @@
+<div class="app-container">
+  <header>
+    <h1>Time 🕒</h1>
+    <p>Global Time & Meeting Assistant</p>
+  </header>
+
+  <nav class="tab-navigation">
+    <button class="tab-btn active" onclick="switchTab('time-by-cities')">Cities</button>
+    <button class="tab-btn" onclick="switchTab('meeting-planner')">Planner</button>
+  </nav>
+
+  <div id="time-by-cities" class="tab-content active">
+    <section class="inputs-section">
+      <h3>1. Origin Setup</h3>
+      <div class="input-vertical-full">
+        <div class="input-group">
+          <label>Date & Time:</label>
+          <input type="datetime-local" id="input-datetime-1" value="2026-05-30T12:00">
+        </div>
+        <div class="input-group">
+          <label for="select-origen">Origin City:</label>
+          <select id="select-origen" class="selector-ciudad-global">
+            </select>
+        </div>
+      </div>
+    </section>
+
+    <section class="outputs-section">
+      <h3>2. World Timezones</h3>
+      
+      <div class="section-divider">Fixed Cities</div>
+      <div class="list-ciudades" id="ciudades-fijas">
+        </div>
+      
+      <div class="section-divider">Custom Cities (Select)</div>
+      <div class="custom-inputs-vertical">
+        <select class="input-libre selector-ciudad-global" id="libre-1"><option value="">-- Select City --</option></select>
+        <select class="input-libre selector-ciudad-global" id="libre-2"><option value="">-- Select City --</option></select>
+        <select class="input-libre selector-ciudad-global" id="libre-3"><option value="">-- Select City --</option></select>
+        <select class="input-libre selector-ciudad-global" id="libre-4"><option value="">-- Select City --</option></select>
+      </div>
+      
+      <div class="list-ciudades" id="ciudades-libres">
+        </div>
+    </section>
+  </div>
+
+  <div id="meeting-planner" class="tab-content">
+    <section class="inputs-section">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+        <h3 style="margin: 0;">1. Meeting & Window Setup</h3>
+        <button id="btn-reset-planner" class="reset-btn" onclick="resetPlanner()">Clear All</button>
+      </div>
+      
+      <div class="planner-row-compact" style="background: #e2e8f0; padding: 6px; border-radius: 6px; margin-bottom: 8px;">
+        <div class="input-group-half">
+          <label class="label-compact">Work Starts:</label>
+          <input type="time" id="work-start" class="input-compact" value="08:00">
+        </div>
+        <div class="input-group-half">
+          <label class="label-compact">Work Ends:</label>
+          <input type="time" id="work-end" class="input-compact" value="17:00">
+        </div>
+      </div>
+
+      <div class="planner-row-compact" style="margin-bottom: 10px;">
+        <div class="input-group-half">
+          <label class="label-compact">Date:</label>
+          <input type="date" id="input-date-2" class="input-compact" value="2026-05-30">
+        </div>
+        <div class="input-group-half">
+          <label class="label-compact">Duration:</label>
+          <select id="select-duration" class="input-compact">
+            <option value="30">30 Min</option>
+            <option value="60" selected>1 Hour</option>
+            <option value="90">1.5 Hours</option>
+            <option value="120">2 Hours</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label>Attendees (City 1 is the Host):</label>
+        <div class="custom-inputs-vertical">
+          <select class="input-planner-city selector-ciudad-global" id="plan-city-1"><option value="">-- Select City --</option></select>
+          <select class="input-planner-city selector-ciudad-global" id="plan-city-2"><option value="">-- Select City --</option></select>
+          <select class="input-planner-city selector-ciudad-global" id="plan-city-3"><option value="">-- Select City --</option></select>
+          <select class="input-planner-city selector-ciudad-global" id="plan-city-4"><option value="">-- Select City --</option></select>
+          <select class="input-planner-city selector-ciudad-global" id="plan-city-5"><option value="">-- Select City --</option></select>
+        </div>
+      </div>
+    </section>
+
+    <section class="outputs-section">
+      <h3>2. Available Slots</h3>
+      <div id="meeting-results" class="results-container">
+        <p class="placeholder-text">Select at least 2 cities to compute shared slots.</p>
+      </div>
+    </section>
+  </div>
+</div>
+
+<style>
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background-color: #f4f7f6;
+  color: #333;
+  margin: 0;
+  padding: 10px;
+  display: flex;
+  justify-content: center;
+}
+
+.app-container {
+  background: white;
+  width: 100%;
+  max-width: 450px;
+  padding: 15px;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  box-sizing: border-box;
+}
+
+header h1 { font-size: 1.6rem; margin: 0; text-align: center; color: #2c3e50; }
+header p { font-size: 0.85rem; margin: 2px 0 12px 0; text-align: center; color: #7f8c8d; }
+
+.tab-navigation {
+  display: flex;
+  border-bottom: 2px solid #e2e8f0;
+  margin-bottom: 15px;
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  background: none;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #718096;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  text-align: center;
+  -webkit-tap-highlight-color: transparent;
+}
+.tab-btn.active {
+  color: #3182ce;
+  border-bottom-color: #3182ce;
+}
+
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+.inputs-section {
+  background: #f8fafc;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  border: 1px solid #e2e8f0;
+}
+
+h3 { font-size: 1rem; margin-top: 0; margin-bottom: 10px; color: #2d3748; }
+.input-group { margin-bottom: 10px; }
+
+.input-vertical-full {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+.input-vertical-full .input-group {
+  width: 100%;
+}
+
+/* CONTENEDOR ESTRICTO DE 2 COLUMNAS AL 50% */
+.planner-row-compact {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.input-group-half {
+  flex: 1;
+  width: 50%;
+  box-sizing: border-box;
+}
+
+/* REDUCCIÓN DE TAMAÑOS EN EL PLANNER PARA EVITAR SOLAPAMIENTOS */
+.label-compact {
+  font-size: 0.78rem !important;
+  font-weight: 600;
+  margin-bottom: 2px !important;
+  color: #4a5568;
+  display: block;
+}
+
+.input-compact {
+  padding: 5px 6px !important;
+  font-size: 0.85rem !important;
+  height: 32px;
+  border-radius: 5px;
+  border: 1px solid #cbd5e1;
+  background: white;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+label { font-size: 0.85rem; font-weight: 600; margin-bottom: 3px; display: block; color: #4a5568; }
+select, input {
+  padding: 8px 10px; border: 1px solid #cbd5e1;
+  border-radius: 6px; font-size: 0.95rem; background: white; box-sizing: border-box;
+  width: 100%;
+}
+
+.custom-inputs-vertical {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.input-libre, .input-planner-city {
+  font-size: 0.85rem;
+  padding: 6px 8px;
+  background-color: #fff;
+}
+
+.reset-btn {
+  background-color: #edf2f7; color: #4a5568; border: 1px solid #cbd5e1;
+  padding: 4px 10px; font-size: 0.75rem; font-weight: bold; border-radius: 4px;
+  cursor: pointer; -webkit-tap-highlight-color: transparent;
+}
+.reset-btn:active { background-color: #cbd5e1; }
+
+.section-divider {
+  font-size: 0.75rem; font-weight: 700; color: #a0aec0;
+  text-transform: uppercase; margin: 15px 0 8px 0;
+  border-bottom: 1px dashed #e2e8f0; padding-bottom: 2px;
+}
+
+.list-ciudades { display: flex; flex-direction: column; gap: 6px; }
+
+.tarjeta-ciudad {
+  background: #edf2f7; padding: 10px 14px; border-radius: 6px;
+  border-left: 4px solid #3182ce; display: flex;
+  justify-content: space-between; align-items: center; box-sizing: border-box;
+}
+
+.info-ciudad-bloque {
+  display: flex; flex-direction: column; gap: 2px;
+  margin-right: 15px; overflow: hidden;
+}
+
+.tarjeta-ciudad h4 { 
+  margin: 0; font-size: 0.9rem; color: #2d3748;
+  line-height: 1.2; word-break: break-word;
+}
+
+.tarjeta-ciudad .fecha-destino { font-size: 0.72rem; color: #718096; }
+.tarjeta-ciudad .hora { font-size: 1.15rem; font-weight: bold; color: #2b6cb0; white-space: nowrap; }
+
+.results-container { background: #f7fafc; border: 1px solid #e2e8f0; padding: 12px; border-radius: 8px; font-size: 0.85rem; }
+.placeholder-text { color: #a0aec0; text-align: center; margin: 0; font-size: 0.85rem; }
+</style>
+
+<script>
+const masterCities = [
+  { displayName: "🇨🇴 Bogota", zone: "America/Bogota", cleanName: "Bogota", priority: true },
+  { displayName: "🇺🇸 Chicago", zone: "America/Chicago", cleanName: "Chicago", priority: true },
+  { displayName: "🇪🇸 Madrid", zone: "Europe/Madrid", cleanName: "Madrid", priority: true },
+  { displayName: "🇲🇽 Mexico City", zone: "America/Mexico_City", cleanName: "Mexico City", priority: true },
+  { displayName: "🇮🇹 Milan", zone: "Europe/Rome", cleanName: "Milan", priority: true },
+  { displayName: "🇺🇸 Minneapolis", zone: "America/Chicago", cleanName: "Minneapolis", priority: true },
+  { displayName: "🇺🇸 New York", zone: "America/New_York", cleanName: "New York", priority: true },
+  { displayName: "🇺🇸 Phoenix", zone: "America/Phoenix", cleanName: "Phoenix", priority: true },
+
+  { displayName: "🇺🇸 Albuquerque", zone: "America/Denver", cleanName: "Albuquerque", priority: false },
+  { displayName: "🇺🇸 Atlanta", zone: "America/New_York", cleanName: "Atlanta", priority: false },
+  { displayName: "🇺🇸 Austin", zone: "America/Chicago", cleanName: "Austin", priority: false },
+  { displayName: "🇺🇸 Baltimore", zone: "America/New_York", cleanName: "Baltimore", priority: false },
+  { displayName: "🇺🇸 Boston", zone: "America/New_York", cleanName: "Boston", priority: false },
+  { displayName: "🇺🇸 Charlotte", zone: "America/New_York", cleanName: "Charlotte", priority: false },
+  { displayName: "🇺🇸 Columbus", zone: "America/New_York", cleanName: "Columbus", priority: false },
+  { displayName: "🇺🇸 Dallas", zone: "America/Chicago", cleanName: "Dallas", priority: false },
+  { displayName: "🇺🇸 Denver", zone: "America/Denver", cleanName: "Denver", priority: false },
+  { displayName: "🇺🇸 Detroit", zone: "America/Detroit", cleanName: "Detroit", priority: false },
+  { displayName: "🇺🇸 El Paso", zone: "America/Denver", cleanName: "El Paso", priority: false },
+  { displayName: "🇺🇸 Fort Worth", zone: "America/Chicago", cleanName: "Fort Worth", priority: false },
+  { displayName: "🇺🇸 Fresno", zone: "America/Los_Angeles", cleanName: "Fresno", priority: false },
+  { displayName: "🇺🇸 Houston", zone: "America/Chicago", cleanName: "Houston", priority: false },
+  { displayName: "🇺🇸 Indianapolis", zone: "America/Indiana/Indianapolis", cleanName: "Indianapolis", priority: false },
+  { displayName: "🇺🇸 Jacksonville", zone: "America/New_York", cleanName: "Jacksonville", priority: false },
+  { displayName: "🇺🇸 Kansas City", zone: "America/Chicago", cleanName: "Kansas City", priority: false },
+  { displayName: "🇺🇸 Las Vegas", zone: "America/Los_Angeles", cleanName: "Las Vegas", priority: false },
+  { displayName: "🇺🇸 Los Angeles", zone: "America/Los_Angeles", cleanName: "Los Angeles", priority: false },
+  { displayName: "🇺🇸 Louisville", zone: "America/Kentucky/Louisville", cleanName: "Louisville", priority: false },
+  { displayName: "🇺🇸 Memphis", zone: "America/Chicago", cleanName: "Memphis", priority: false },
+  { displayName: "🇺🇸 Mesa", zone: "America/Phoenix", cleanName: "Mesa", priority: false },
+  { displayName: "🇺🇸 Miami", zone: "America/New_York", cleanName: "Miami", priority: false },
+  { displayName: "🇺🇸 Milwaukee", zone: "America/Chicago", cleanName: "Milwaukee", priority: false },
+  { displayName: "🇺🇸 Nashville", zone: "America/Chicago", cleanName: "Nashville", priority: false },
+  { displayName: "🇺🇸 Oklahoma City", zone: "America/Chicago", cleanName: "Oklahoma City", priority: false },
+  { displayName: "🇺🇸 Omaha", zone: "America/Chicago", cleanName: "Omaha", priority: false },
+  { displayName: "🇺🇸 Philadelphia", zone: "America/New_York", cleanName: "Philadelphia", priority: false },
+  { displayName: "🇺🇸 Portland", zone: "America/Los_Angeles", cleanName: "Portland", priority: false },
+  { displayName: "🇺🇸 Sacramento", zone: "America/Los_Angeles", cleanName: "Sacramento", priority: false },
+  { displayName: "🇺🇸 San Antonio", zone: "America/Chicago", cleanName: "San Antonio", priority: false },
+  { displayName: "🇺🇸 San Diego", zone: "America/Los_Angeles", cleanName: "San Diego", priority: false },
+  { displayName: "🇺🇸 San Francisco", zone: "America/Los_Angeles", cleanName: "San Francisco", priority: false },
+  { displayName: "🇺🇸 San Jose", zone: "America/Los_Angeles", cleanName: "San Jose", priority: false },
+  { displayName: "🇺🇸 Seattle", zone: "America/Los_Angeles", cleanName: "Seattle", priority: false },
+  { displayName: "🇺🇸 Tucson", zone: "America/Phoenix", cleanName: "Tucson", priority: false },
+  { displayName: "🇺🇸 Washington D.C.", zone: "America/New_York", cleanName: "Washington D.C.", priority: false },
+  { displayName: "🇨🇦 Calgary", zone: "America/Calgary", cleanName: "Calgary", priority: false },
+  { displayName: "🇨🇦 Edmonton", zone: "America/Edmonton", cleanName: "Edmonton", priority: false },
+  { displayName: "🇨🇦 Halifax", zone: "America/Halifax", cleanName: "Halifax", priority: false },
+  { displayName: "🇨🇦 Hamilton", zone: "America/Toronto", cleanName: "Hamilton", priority: false },
+  { displayName: "🇨🇦 Montreal", zone: "America/Montreal", cleanName: "Montreal", priority: false },
+  { displayName: "🇨🇦 Ottawa", zone: "America/Toronto", cleanName: "Ottawa", priority: false },
+  { displayName: "🇨🇦 Quebec City", zone: "America/Montreal", cleanName: "Quebec City", priority: false },
+  { displayName: "🇨🇦 Toronto", zone: "America/Toronto", cleanName: "Toronto", priority: false },
+  { displayName: "🇨🇦 Vancouver", zone: "America/Vancouver", cleanName: "Vancouver", priority: false },
+  { displayName: "🇨🇦 Winnipeg", zone: "America/Winnipeg", cleanName: "Winnipeg", priority: false },
+  { displayName: "🇬🇭 Accra", zone: "Africa/Accra", cleanName: "Accra", priority: false },
+  { displayName: "🇪🇹 Addis Ababa", zone: "Africa/Addis_Ababa", cleanName: "Addis Ababa", priority: false },
+  { displayName: "🇩🇿 Algiers", zone: "Africa/Algiers", cleanName: "Algiers", priority: false },
+  { displayName: "🇹🇷 Ankara", zone: "Europe/Istanbul", cleanName: "Ankara", priority: false },
+  { displayName: "🇳🇬 Abuja", zone: "Africa/Lagos", cleanName: "Abuja", priority: false },
+  { displayName: "🇮🇶 Baghdad", zone: "Asia/Baghdad", cleanName: "Baghdad", priority: false },
+  { displayName: "🇹🇭 Bangkok", zone: "Asia/Bangkok", cleanName: "Bangkok", priority: false },
+  { displayName: "🇨🇳 Beijing", zone: "Asia/Shanghai", cleanName: "Beijing", priority: false },
+  { displayName: "🇩🇪 Berlin", zone: "Europe/Berlin", cleanName: "Berlin", priority: false },
+  { displayName: "🇧🇷 Brasilia", zone: "America/Sao_Paulo", cleanName: "Brasilia", priority: false },
+  { displayName: "🇷🇴 Bucharest", zone: "Europe/Bucharest", cleanName: "Bucharest", priority: false },
+  { displayName: "🇦🇷 Buenos Aires", zone: "America/Buenos_Aires", cleanName: "Buenos Aires", priority: false },
+  { displayName: "🇪🇬 Cairo", zone: "Africa/Cairo", cleanName: "Cairo", priority: false },
+  { displayName: "🇻🇪 Caracas", zone: "America/Caracas", cleanName: "Caracas", priority: false },
+  { displayName: "🇲🇩 Chisinau", zone: "Europe/Chisinau", cleanName: "Chisinau", priority: false },
+  { displayName: "🇧🇩 Dhaka", zone: "Asia/Dhaka", cleanName: "Dhaka", priority: false },
+  { displayName: "🇻🇳 Hanoi", zone: "Asia/Ho_Chi_Minh", cleanName: "Hanoi", priority: false },
+  { displayName: "🇵🇰 Islamabad", zone: "Asia/Karachi", cleanName: "Islamabad", priority: false },
+  { displayName: "🇮🇩 Jakarta", zone: "Asia/Jakarta", cleanName: "Jakarta", priority: false },
+  { displayName: "🇦🇫 Kabul", zone: "Asia/Kabul", cleanName: "Kabul", priority: false },
+  { displayName: "🇳🇵 Kathmandu", zone: "Asia/Kathmandu", cleanName: "Kathmandu", priority: false },
+  { displayName: "🇺🇦 Kyiv", zone: "Europe/Kyiv", cleanName: "Kyiv", priority: false },
+  { displayName: "🇲🇿 Khartoum", zone: "Africa/Khartoum", cleanName: "Khartoum", priority: false },
+  { displayName: "🇨🇩 Kinshasa", zone: "Africa/Kinshasa", cleanName: "Kinshasa", priority: false },
+  { displayName: "🇲🇾 Kuala Lumpur", zone: "Asia/Kuala_Lumpur", cleanName: "Kuala Lumpur", priority: false },
+  { displayName: "🇵🇪 Lima", zone: "America/Lima", cleanName: "Lima", priority: false },
+  { displayName: "🇬🇧 London", zone: "Europe/London", cleanName: "London", priority: false },
+  { displayName: "🇦🇴 Luanda", zone: "Africa/Luanda", cleanName: "Luanda", priority: false },
+  { displayName: "🇵🇭 Manila", zone: "Asia/Manila", cleanName: "Manila", priority: false },
+  { displayName: "🇲🇿 Maputo", zone: "Africa/Maputo", cleanName: "Maputo", priority: false },
+  { displayName: "🇷🇺 Moscow", zone: "Europe/Moscow", cleanName: "Moscow", priority: false },
+  { displayName: "🇰🇪 Nairobi", zone: "Africa/Nairobi", cleanName: "Nairobi", priority: false },
+  { displayName: "🇲🇲 Naypyidaw", zone: "Asia/Yangon", cleanName: "Naypyidaw", priority: false },
+  { displayName: "🇮🇳 New Delhi", zone: "Asia/Kolkata", cleanName: "New Delhi", priority: false },
+  { displayName: "🇫🇷 Paris", zone: "Europe/Paris", cleanName: "Paris", priority: false },
+  { displayName: "🇿🇦 Pretoria", zone: "Africa/Johannesburg", cleanName: "Pretoria", priority: false },
+  { displayName: "🇲🇦 Rabat", zone: "Africa/Casablanca", cleanName: "Rabat", priority: false },
+  { displayName: "🇸🇦 Riyadh", zone: "Asia/Riyadh", cleanName: "Riyadh", priority: false },
+  { displayName: "🇮🇹 Rome", zone: "Europe/Rome", cleanName: "Rome", priority: false },
+  { displayName: "🇾🇪 Sana'a", zone: "Asia/Aden", cleanName: "Sana'a", priority: false },
+  { displayName: "🇨🇱 Santiago", zone: "America/Santiago", cleanName: "Santiago", priority: false },
+  { displayName: "🇰🇷 Seoul", zone: "Asia/Tokyo", cleanName: "Seoul", priority: false },
+  { displayName: "🇱🇰 Sri Jayawardenepura Kotte", zone: "Asia/Kolkata", cleanName: "Sri Jayawardenepura Kotte", priority: false },
+  { displayName: "🇺🇿 Tashkent", zone: "Asia/Tashkent", cleanName: "Tashkent", priority: false },
+  { displayName: "🇮🇷 Tehran", zone: "Asia/Tehran", cleanName: "Tehran", priority: false },
+  { displayName: "🇯🇵 Tokyo", zone: "Asia/Tokyo", cleanName: "Tokyo", priority: false },
+  { displayName: "🇵🇱 Warsaw", zone: "Europe/Warsaw", cleanName: "Warsaw", priority: false }
+];
+
+const fixedCitiesList = [
+  { name: "Madrid", zone: "Europe/Madrid" },
+  { name: "Milan", zone: "Europe/Rome" },
+  { name: "New York", zone: "America/New_York" },
+  { name: "Chicago", zone: "America/Chicago" },
+  { name: "Minneapolis", zone: "America/Chicago" },
+  { name: "Phoenix", zone: "America/Phoenix" },
+  { name: "Mexico City", zone: "America/Mexico_City" },
+  { name: "Bogota", zone: "America/Bogota" }
+];
+
+const priorityGroup = masterCities.filter(c => c.priority).sort((a,b) => a.cleanName.localeCompare(b.cleanName));
+const regularGroup = masterCities.filter(c => !c.priority).sort((a,b) => a.cleanName.localeCompare(b.cleanName));
+
+function populateDropdowns() {
+  const selects = document.querySelectorAll('.selector-ciudad-global');
+  selects.forEach(select => {
+    let optionsHtml = `<option value="">-- Select City --</option>`;
+    
+    priorityGroup.forEach(city => {
+      optionsHtml += `<option value="${city.zone}">${city.displayName}</option>`;
+    });
+    
+    optionsHtml += `<option disabled>──────────────────</option>`;
+    
+    regularGroup.forEach(city => {
+      optionsHtml += `<option value="${city.zone}">${city.displayName}</option>`;
+    });
+    
+    select.innerHTML = optionsHtml;
+  });
+  
+  const originSelect = document.getElementById('select-origen');
+  if (originSelect) originSelect.value = "Europe/Madrid";
+}
+
+function switchTab(tabId) {
+  document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+  
+  document.getElementById(tabId).classList.add('active');
+  const activeBtn = Array.from(document.querySelectorAll('.tab-btn')).find(btn => 
+    btn.getAttribute('onclick').includes(tabId)
+  );
+  if (activeBtn) activeBtn.classList.add('active');
+}
+
+function resetPlanner() {
+  for (let i = 1; i <= 5; i++) {
+    const selectEl = document.getElementById(`plan-city-${i}`);
+    if (selectEl) selectEl.value = "";
+  }
+  const resultsContainer = document.getElementById('meeting-results');
+  if (resultsContainer) {
+    resultsContainer.innerHTML = '<p class="placeholder-text">Select at least 2 cities to compute shared slots.</p>';
+  }
+}
+
+function getTargetDateTime(baseDateStr, originZone, targetZone) {
+  const parts = baseDateStr.match(/(\d+)-(\d+)-(\d+)T(\d+):(\d+)/);
+  if (!parts) return { time: '--:--', date: '---' };
+  
+  const year = parseInt(parts[1]), month = parseInt(parts[2]) - 1, day = parseInt(parts[3]);
+  const hour = parseInt(parts[4]), minute = parseInt(parts[5]);
+  
+  const formatterOptions = {
+    year: 'numeric', month: 'numeric', day: 'numeric',
+    hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: false
+  };
+  
+  const originFormatter = new Intl.DateTimeFormat('en-US', { ...formatterOptions, timeZone: originZone });
+  const targetFormatter = new Intl.DateTimeFormat('en-US', { ...formatterOptions, timeZone: targetZone });
+  
+  const utcSnapshot = new Date(Date.UTC(year, month, day, hour, minute));
+  
+  function getOffsetMinutes(formatter, refDate) {
+    const parts = formatter.formatToParts(refDate);
+    const dateParts = {};
+    parts.forEach(p => { dateParts[p.type] = parseInt(p.value); });
+    
+    const localD = Date.UTC(dateParts.year, dateParts.month - 1, dateParts.day, dateParts.hour === 24 ? 0 : dateParts.hour, dateParts.minute);
+    return Math.round((localD - refDate.getTime()) / 60000);
+  }
+  
+  const originOffset = getOffsetMinutes(originZone === 'UTC' ? { formatToParts: () => [] } : originFormatter, utcSnapshot);
+  const targetOffset = getOffsetMinutes(targetZone === 'UTC' ? { formatToParts: () => [] } : targetFormatter, utcSnapshot);
+  
+  const actualTargetTimestamp = utcSnapshot.getTime() - (originOffset * 60000) + (targetOffset * 60000);
+  const targetDateObject = new Date(actualTargetTimestamp);
+  
+  const finalTimeStr = targetDateObject.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'UTC' });
+  const finalDateStr = targetDateObject.toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' });
+  
+  return { time: finalTimeStr, date: finalDateStr };
+}
+
+function updateCitiesTab() {
+  const datetimeValue = document.getElementById('input-datetime-1').value;
+  const originZone = document.getElementById('select-origen').value;
+  
+  if (!datetimeValue || originZone === "") return;
+  
+  const fixedContainer = document.getElementById('ciudades-fijas');
+  fixedContainer.innerHTML = '';
+  fixedCitiesList.forEach(city => {
+    const data = getTargetDateTime(datetimeValue, originZone, city.zone);
+    fixedContainer.appendChild(createCityCard(city.name, data.time, data.date));
+  });
+
+  const customContainer = document.getElementById('ciudades-libres');
+  customContainer.innerHTML = '';
+  for (let i = 1; i <= 4; i++) {
+    const selectEl = document.getElementById(`libre-${i}`);
+    const targetZone = selectEl.value;
+    if (targetZone !== "") {
+      const cityName = selectEl.options[selectEl.selectedIndex].text;
+      const data = getTargetDateTime(datetimeValue, originZone, targetZone);
+      customContainer.appendChild(createCityCard(cityName, data.time, data.date));
+    }
+  }
+}
+
+function createCityCard(cityName, formattedTime, formattedDate) {
+  const card = document.createElement('div');
+  card.className = 'tarjeta-ciudad';
+  card.innerHTML = `
+    <div class="info-ciudad-bloque">
+      <h4>${cityName}</h4>
+      <div class="fecha-destino">${formattedDate}</div>
+    </div>
+    <div class="hora">${formattedTime}</div>
+  `;
+  return card;
+}
+
+function updatePlannerTab() {
+  const dateValue = document.getElementById('input-date-2').value;
+  const duration = parseInt(document.getElementById('select-duration').value);
+  const resultsContainer = document.getElementById('meeting-results');
+  
+  const startHourInput = document.getElementById('work-start').value.split(':');
+  const endHourInput = document.getElementById('work-end').value.split(':');
+  
+  const workStartLimit = parseInt(startHourInput[0]) + (parseInt(startHourInput[1]) / 60);
+  const workEndLimit = parseInt(endHourInput[0]) + (parseInt(endHourInput[1]) / 60);
+  
+  const zones = [];
+  const cityNames = [];
+  
+  for (let i = 1; i <= 5; i++) {
+    const selectEl = document.getElementById(`plan-city-${i}`);
+    const zone = selectEl.value;
+    if (zone && zone !== "") {
+      zones.push(zone);
+      cityNames.push(selectEl.options[selectEl.selectedIndex].text);
+    }
+  }
+  
+  if (zones.length < 2) {
+    resultsContainer.innerHTML = '<p class="placeholder-text">Select at least 2 cities to compute shared slots.</p>';
+    return;
+  }
+
+  const hostZone = zones[0]; 
+  let availableSlots = [];
+  
+  for (let hour = 0; hour < 24; hour++) {
+    let allMatch = true;
+    let slotDetails = {};
+    const hostSimulatedIso = `${dateValue}T${String(hour).padStart(2, '0')}:00`;
+    
+    for (let i = 0; i < zones.length; i++) {
+      const checkLocal = getTargetDateTime(hostSimulatedIso, hostZone, zones[i]);
+      const localHour = parseInt(checkLocal.time.split(':')[0]);
+      const localMinute = parseInt(checkLocal.time.split(':')[1]);
+      
+      const startHourDecimal = localHour + (localMinute / 60);
+      const endHourDecimal = startHourDecimal + (duration / 60);
+      
+      if (startHourDecimal < workStartLimit || endHourDecimal > workEndLimit || isNaN(localHour)) {
+        allMatch = false;
+        break;
+      }
+      slotDetails[cityNames[i]] = checkLocal.time;
+    }
+
+    if (allMatch) {
+      availableSlots.push(slotDetails);
+    }
+  }
+
+  if (availableSlots.length === 0) {
+    resultsContainer.innerHTML = '<p class="placeholder-text" style="color: #dd6b20; font-weight: 500;">❌ No matching slots found within your custom work window. Try widening the hours or click "Clear All" above.</p>';
+  } else {
+    resultsContainer.innerHTML = '<h4 style="margin: 0 0 8px 0; color: #2f855a; font-size:0.9rem;">✅ Feasible Working-Hour Slots:</h4>';
+    availableSlots.forEach(slot => {
+      const slotRow = document.createElement('div');
+      slotRow.style.background = '#f0fff4';
+      slotRow.style.border = '1px solid #c6f6d5';
+      slotRow.style.padding = '6px 10px';
+      slotRow.style.borderRadius = '6px';
+      slotRow.style.marginBottom = '6px';
+      slotRow.style.fontSize = '0.78rem';
+      
+      let text = "";
+      for (const [city, time] of Object.entries(slot)) {
+        text += `<strong>${city}</strong> ${time} | `;
+      }
+      slotRow.innerHTML = text.slice(0, -3);
+      resultsContainer.appendChild(slotRow);
+    });
+  }
+}
+
+function initApp() {
+  populateDropdowns();
+
+  const dt1 = document.getElementById('input-datetime-1');
+  const so = document.getElementById('select-origen');
+  if(dt1) dt1.addEventListener('input', updateCitiesTab);
+  if(so) so.addEventListener('change', updateCitiesTab);
+  
+  for (let i = 1; i <= 4; i++) {
+    const el = document.getElementById(`libre-${i}`);
+    if(el) el.addEventListener('change', updateCitiesTab);
+  }
+
+  const d2 = document.getElementById('input-date-2');
+  const sd = document.getElementById('select-duration');
+  const ws = document.getElementById('work-start');
+  const we = document.getElementById('work-end');
+  
+  if(d2) d2.addEventListener('input', updatePlannerTab);
+  if(sd) sd.addEventListener('change', updatePlannerTab);
+  if(ws) ws.addEventListener('input', updatePlannerTab);
+  if(we) we.addEventListener('input', updatePlannerTab);
+  
+  for (let i = 1; i <= 5; i++) {
+    const el = document.getElementById(`plan-city-${i}`);
+    if(el) el.addEventListener('change', updatePlannerTab);
+  }
+
+  updateCitiesTab();
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initApp);
+} else {
+  initApp();
+}
+</script>
